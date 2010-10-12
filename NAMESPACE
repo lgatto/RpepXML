@@ -1,0 +1,34 @@
+importClassesFrom(Biobase, Versioned)
+
+export("as.matrix.MSMSpepXML",
+       "parseMSMSpepXML",
+       "proteinSummary")
+
+exportMethods("[","assumedCharge<-",assumedCharge,
+              "endScan<-",endScan,
+              filterHits,"hitRank<-",
+              hitRank,ionScore,
+              "modifications<-",modifications,
+              nProteins,nSearchHits,nSearchResults,nSpectrumQueries,
+              "pepFile<-",pepFile,
+              "pepSequence<-",pepSequence,
+              "precNeutralMass<-",precNeutralMass,
+              "proteins<-",proteins,
+              "queryIndex<-",queryIndex,
+              "sampleEnzyme<-",sampleEnzyme,
+              "scores<-",scores,
+              "searchDatabase<-",searchDatabase,
+              "searchEngine<-",searchEngine,
+              "searchHits<-",searchHits,
+              "searchId<-",searchId,
+              "searchResults<-",searchResults,
+              show,
+              "spectrumId<-",spectrumId,
+              "spectrumQueries<-",spectrumQueries,
+              "startScan<-",startScan)
+
+exportClasses(
+              MSMSpepXML,
+              SearchHit,
+              SearchResult,
+              SpectrumQuery)

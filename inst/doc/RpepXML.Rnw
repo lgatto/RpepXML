@@ -1,0 +1,239 @@
+\SweaveOpts{engine=R,eps=FALSE}
+
+%\VignetteIndexEntry{RpepXML: R interface to the pepXML format. }
+%\VignetteKeywords{Mass spectrometry, MSMS, proteomics}
+%\VignettePackage{RpepXML}
+
+\documentclass{Z}
+
+\author{Laurent Gatto\\%%
+  \url{lg390@cam.ac.uk}\\%%
+  Cambridge Centre for Proteomics -- EBI\\%%
+  \url{www.bio.cam.ac.uk/proteomics} -- \url{www.ebi.ac.uk}
+}
+\Plainauthor{Laurent Gatto}
+
+\Keywords{mass spectrometry, proteomics, MSMS, identification, XML}
+\Plainkeywords{mass spectrometry, proteomics, MSMS, identification, XML}
+
+\hyphenation{ma-ni-pu-lating}
+
+\title{\pkg{RpepXML}: an R interface to the pepXML format for peptide identification. }
+\Plaintitle{\pkg{RpepXML}: an R interface to the pepXML format for peptide identification. }
+
+\Abstract{
+  This vignette describes the data structures and associated methods 
+  and functions to import and inspect peptide identification data in 
+  the \code{pepXML} format. 
+}
+
+\begin{document}
+
+\section{Introduction}
+
+From the \code{pepXML} webpage\footnote{\url{http://tools.proteomecenter.org/wiki/index.php?title=Formats:pepXML}}: 
+\begin{quote}
+\code{pepXML} is an open data format developed at the SPC/Institute for 
+Systems biology\footnote{%
+  \url{http://tools.proteomecenter.org/wiki/index.php?title=Main_Page}}
+for the storage, exchange, and processing of peptide sequence assignments 
+of MS/MS scans. \code{pepXML} is intended to provide a common data output 
+format for many different MS/MS search engines and subsequent peptide-level 
+analyses. Several search engines already have native support for outputting 
+\code{pepXML} and converters are available to transform output files to 
+\code{pepXML}.
+\end{quote}
+
+Note that the HUPO Proteomics Standards Initiative%%
+\footnote{\url{http://www.psidev.info/}} (PSI) has also develop an exchange 
+standard for database search results, called \code{mzIdentXML}%%
+\footnote{\url{http://www.psidev.info/index.php?q=node/319}}. It is not yet 
+as widely used as \code{pepXML} but should supersede the latter. 
+A \code{RmzIdentML} library will be developed at a later stage. 
+
+Currently, only the generic MSMS identification results of the 
+\code{msms\_pipeline\_analysis} is implemented. This package has currently 
+been tested and developed around Mascot%
+\footnote{\url{http://www.matrixscience.com/}} search results. 
+
+\section{Getting data into R}
+
+The functionality of \code{RpepXML} will be illustrated with a dummy example 
+file that is provided with the package. It is parsed with the 
+\code{parseMSMSpepXML} function, that takes a file name as first parameter. 
+The second one defined whether a progress bar should be displayed.
+This function returns an object of class \code{MSMSpepXML}.
+
+<<label=load,echo=TRUE>>=
+library("RpepXML")
+pepxml <- system.file("extdata","tinySearch.pepXML",package="RpepXML")
+ms <- parseMSMSpepXML(pepfile=pepxml, verbose=FALSE)
+class(ms)
+@ 
+
+\section{Data structures and manipulation}
+
+The classes implemented mimic a simplified version of the XML structure for 
+the \code{msms\_pipeline\_analysis} element (see the (older) docs%
+\footnote{\url{http://sashimi.sourceforge.net/schema_revision/pepXML/Docs/pepXML_v18.html}}, 
+for a browsable description). The structure of the 4 classes is described below, 
+starting with the main, high-level, data structure. Each class and slots are 
+described in the respective on-line manuals.
+
+The classes are versioned individually and the class version can be retrieved 
+with \code{classVersion()}.
+
+\subsection{MSMSpepXML}
+
+<<label=MSMSpepXMLClass,echo=TRUE>>=
+getClass("MSMSpepXML")
+@ 
+
+\code{MSMSpepXML} is the main class that holds general meta-data about the search 
+like the search engine, the sample enzyme and the original database used to 
+query the MSMS spectra. The name of the \code{pepXML} file also recorded. 
+All the spectrum queries are stored as a list. 
+
+<<label=MSMSpepXMLUtil1,echo=TRUE>>=
+ms
+pepFile(ms)
+searchEngine(ms)
+sampleEnzyme(ms)
+searchDatabase(ms)
+@ 
+
+The spectrum queries can be accessed using the \code{spectrumQueries} method 
+or the \code{[} operator. The former returns a list that can be subsetted as 
+  usual. The latter return a list when multiple spectra are selected or and 
+  object of class \code{SpectrumQuery} if one query is provided.
+
+<<label=MSMSpepXMLUtil2,echo=TRUE>>=
+class(spectrumQueries(ms))
+sq <- ms[3]
+class(sq)
+@ 
+
+\subsection{SpectrumQuery}
+
+<<label=SpectrumQueryClass,echo=TRUE>>=
+getClass("SpectrumQuery")
+@ 
+
+\code{SpectrumQuery} objects hold the information about specific spectra
+that have been queried. Note that all pieces of information may not be 
+provided in the \code{pepXML} file. 
+
+<<label=SpectrumQueryUtil1,echo=TRUE>>=
+sq
+precNeutralMass(sq)
+assumedCharge(sq)
+spectrumId(sq)
+@ 
+
+If any, the search results can be accessed with the \code{searchResuts} or 
+\code{[} operator, that works as described above.
+  
+<<label=SpectrumQueryUtil2,echo=TRUE>>=
+sr <- sq[2]
+@ 
+
+\subsection{SearchResult}
+
+<<label=SearchResultClass,echo=TRUE>>=
+getClass("SearchResult")
+@ 
+
+The \code{SearchResult} class holds the information about a specific 
+search result and the hits that have been identified are available as 
+a list of \code{SearchHit} objects. The latter can be accessed by the 
+\code{searchHits} method or the \code{[} operator.
+
+<<label=SearchResultUtil1,echo=TRUE>>=
+sr
+sh <- sr[1]
+@ 
+
+\subsection{SearchHit}
+
+<<label=SearchHitClass,echo=TRUE>>=
+getClass("SearchHit")
+@ 
+
+The actual results are stored as individual \code{SearchHit} instances. 
+The class records the rank of the hit, the peptide sequence with the 
+previous and next amino acids, possible modifications, associated proteins 
+and scores associated to the hit. The scores are returned as a named vector 
+to retrieve individual scores. The \code{ionScore} method allows to 
+extract specifically the ion score for Mascot results.
+
+<<label=SearchHitUtils1,echo=TRUE>>=
+sh
+hitRank(sh)
+pepSequence(sh)
+scores(sh)
+ionScore(sh)
+proteins(sh)
+@ 
+
+\section{Getting a general overview of the data}
+
+The number of spectrum queries and search results or hits can be 
+extracted with the \code{nSpectrumQueries}, \code{nSearchResults} 
+and \code{nSearchhits} methods. Several methods can also be applied 
+to parent classes to those that actually have the slot to retrieve 
+the slot values from the whole set of objects.
+
+<<label=examples1,echo=TRUE>>=
+nSearchResults(sq)
+proteins(sq[1])
+proteins(sq[2])
+proteins(sq)
+@ 
+
+\code{proteinSummary} and \code{proteinSummary} can be called on any 
+of the classes to retrieve the number of inferred proteins and a table 
+summary.
+
+The \code{filterHits} method can filter any of the classes based on the 
+ion score and the rank of a search hit.
+Except when filtering a \code{SearchHit}, where \code{TRUE} or \code{FALSE} 
+is returned, depending if the hit passes the filtering criteria, 
+\code{filterHits} returns an object of the same class. 
+
+<<label=examples2,echo=TRUE>>=
+msf <- filterHits(ms,rank=2,ionscore=20)
+class(msf)
+proteins(ms[3])
+proteins(msf[3])
+@ 
+
+An \code{MSMSpepXML} object can also be converted to a matrix with 
+\code{as.matrix}. Only first rank hits and the first search results 
+are considered and partial information is returned. 
+The \code{all} parameter defined whether all spectrum queries should 
+be returned or only those with search results.
+
+<<label=example3,echo=TRUE>>=
+as.matrix(msf,all=TRUE)
+@ 
+
+\section{More details}
+
+A full list of functions and methods can be obtained with 
+\code{help(package="RpepXML")}. Methods, functions and classes 
+are documented individually.
+
+
+\section{Session information}
+\label{sec:sessionInfo} 
+
+<<label=sessioninfo,results=tex,echo=FALSE>>=
+toLatex(sessionInfo())
+@
+
+
+\end{document}
+
+
+
+

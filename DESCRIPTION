@@ -1,0 +1,12 @@
+Package: RpepXML
+Type: Package
+Title: R interface to the pepXML standard
+Version: 0.3.2
+Date: 2010-08-27
+Author: Laurent Gatto
+Maintainer: Laurent Gatto <lg390@cam.ac.uk>
+Description: R package to import and manipulate pepXML data.
+License: Artistic-2.0
+LazyLoad: yes
+Depends: Biobase, XML, plyr, methods
+biocViews: Bioinformatics, Infrastructure, Proteomics, MassSpectrometry

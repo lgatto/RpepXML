@@ -1,0 +1,19 @@
+CHANGES IN VERSION 0.3.2 
+------------------------
+ * updated NEWS file
+CHANGES IN VERSION 0.3.1 
+------------------------
+ * nSearchResults also works when for MSMSpepXML instances 
+   with any number of search results (also 0)
+ * updated version number to x.y.z scheme
+ * 
+CHANGES IN VERSION 0.3 
+------------------------
+ * as.matrix returns all scores, instead of ionScore only
+CHANGES IN VERSION 0.2 
+------------------------
+ * Detailed vignette added 
+CHANGES IN VERSION 0.1 
+------------------------
+ * first upload to r-forge <2010-09-07 Tue 18:11>
+ * package can be build and checked without any errors or warnings
