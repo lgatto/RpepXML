@@ -180,3 +180,11 @@ setMethod("[","SpectrumQuery",function(x,i,j="missing",drop="missing") "[.Spectr
     return(searchResults(x)[[i]])
   return(searchResults(x)[i])
 }
+
+
+setMethod("pepSequence","SpectrumQuery",
+          function(object) lapply(searchResults(object),pepSequence))
+
+setMethod("scores","SpectrumQuery",
+          function(object) lapply(searchResults(object),scores))
+

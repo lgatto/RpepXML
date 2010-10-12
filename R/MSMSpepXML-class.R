@@ -178,3 +178,9 @@ setMethod("[","MSMSpepXML",function(x,i,j="missing",drop="missing") "[.MSMSpepXM
 
 setMethod("precNeutralMass","MSMSpepXML",
           function(object) return(sapply(spectrumQueries(object),precNeutralMass)))
+
+setMethod("pepSequence","MSMSpepXML",
+          function(object) lapply(spectrumQueries(object),pepSequence))
+
+setMethod("scores","MSMSpepXML",
+          function(object) lapply(spectrumQueries(object),scores))

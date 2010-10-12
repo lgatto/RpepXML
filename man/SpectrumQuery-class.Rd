@@ -30,6 +30,10 @@
 \alias{endScan,SpectrumQuery-method}
 \alias{endScan<-,SpectrumQuery,integer-method}
 \alias{endScan<-,SpectrumQuery,ANY-method}
+\alias{pepSequence,SpectrumQuery-method}
+\alias{scores,SpectrumQuery-method}
+
+
 
 \title{
   Class to contain individual spectrum query identification data.

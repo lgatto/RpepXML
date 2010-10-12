@@ -28,6 +28,8 @@
 \alias{spectrumQueries,MSMSpepXML-method}
 \alias{assumedCharge,MSMSpepXML-method}
 \alias{filterHits,MSMSpepXML-method}
+\alias{pepSequence,MSMSpepXML-method}
+\alias{scores,MSMSpepXML-method}
 
 
 \title{
